@@ -7,8 +7,9 @@
 import dbus
 import sys
 import subprocess
-import urllib2
 import os
+from urlparse import urlparse
+from urllib import unquote
 from pprint import pprint
 
 save = [".mp3",".flac",".wma",".ogg"] # Don't delete dir if it contains any of these files.
@@ -56,7 +57,7 @@ for ext in exts: #Delete each basename+extension.
     cmdext = ['kioclient', 'move', loc, 'trash:/']
     print "Running %s"%' '.join(cmdext)
     retcodext = subprocess.call(cmdext)
-    path = urllib2.urlparse.urlparse(loc).path
+    path = urlparse(loc).path
     if retcodext == 0:    
         print 'Successfully trashed "%s"'%path
     else:
@@ -64,9 +65,9 @@ for ext in exts: #Delete each basename+extension.
 
 direc = os.path.split(path)[0] #If the dir is empty let's get rid of it, as well.
 subdir = '' # We'll set this below, if it exists.
-direc = direc.replace("%20",' ') # Replace KDE's sillyness.
+direc = unquote(direc) # Replace KDE's sillyness.
 #The following for loops seem a bit ugly, but this seems quicker than using recursion and ending up many levels deep,
-#and the various exists are off-putting, but we want to exit asap if we can.
+#and the various exits are off-putting, but we want to exit asap if we can.
 for f in os.listdir(direc) :
     if os.path.isdir(os.path.join(direc, f)) : # We'll go one level deep, no more, takes time.
         subdir = os.path.join(direc, f)
